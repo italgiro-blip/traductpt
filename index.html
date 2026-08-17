@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tradutor Português-Espanhol B1 - Pró Corrigido</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-slate-100 to-slate-200 min-h-screen py-10 px-4 text-slate-800">
+
+<div class="max-w-3xl mx-auto bg-white shadow-2xl rounded-3xl p-6 md:p-10 border border-slate-100">
+
+    <!-- Cabeçalho -->
+    <header class="mb-8 border-b pb-4 flex justify-between items-center flex-wrap gap-4">
+        <div>
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                Tradutor PT ⇄ ES 🇧🇷 <span class="text-xs bg-blue-100 text-blue-800 font-semibold px-2.5 py-1 rounded-full uppercase">Nível B1</span>
+            </h1>
+            <p class="text-sm text-slate-500 mt-1">
+                Tradução inteligente · Pronúncia avançada · Análise gramatical
+            </p>
+        </div>
+    </header>
+
+    <!-- Direção -->
+    <div class="mb-5">
+        <label for="direccion" class="block text-sm font-semibold text-slate-700 mb-2">
+            Direção da tradução:
+        </label>
+        <select id="direccion" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+            <option value="pt-es">Português ➔ Espanhol</option>
+            <option value="es-pt">Espanhol ➔ Português</option>
+        </select>
+    </div>
+
+    <!-- Texto de entrada -->
+    <div class="mb-5">
+        <div class="flex justify-between items-center mb-2">
+            <label for="texto" class="text-sm font-semibold text-slate-700">
+                Texto ou frase:
+            </label>
+            <button onclick="iniciarVoz()" id="btnMicrofono" class="flex items-center gap-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-3 py-1.5 rounded-xl text-xs font-medium transition shadow-sm">
+                🎙️ Ditado por voz
+            </button>
+        </div>
+        <div class="relative">
+            <textarea id="texto" rows="4" maxlength="300" placeholder="Escreva ou dite qualquer palavra ou frase..." oninput="actualizarContador()" class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none transition text-sm"></textarea>
+            <span id="contadorCaracteres" class="absolute bottom-3 right-3 text-xs text-slate-400">0/300</span>
+        </div>
+    </div>
+
+    <!-- Botão Traduzir -->
+    <button id="btnTraducir" onclick="traducir()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 rounded-xl transition shadow-lg shadow-blue-500/30 flex justify-center items-center gap-2">
+        <span>Traduzir e Analisar</span>
+    </button>
+
+    <!-- Carregando -->
+    <div id="loading" class="hidden text-center my-6 text-slate-500 animate-pulse font-medium text-sm">
+        Traduzindo instantaneamente...
+    </div>
+
+    <!-- Resultado -->
+    <div id="resultado" class="hidden mt-8 border-t pt-6 space-y-6">
+        
+        <!-- Bloco Tradução -->
+        <div>
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                    Tradução obtida:
+                </h2>
+                <button onclick="copiarTraduccion()" class="text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1">
+                    📋 Copiar texto
+                </button>
+            </div>
+            <div id="traduccion" class="text-xl font-bold text-slate-900 bg-slate-50 border border-slate-200 rounded-2xl p-4 shadow-inner"></div>
+        </div>
+
+        <!-- Bloco Áudio / Pronúncia -->
+        <div class="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-5 shadow-sm">
+            <h2 class="font-bold text-emerald-900 mb-3 flex items-center gap-2 text-sm">
+                🔊 Pronúncia Interativa
+            </h2>
+
+            <div class="flex gap-2 flex-wrap items-center">
+                <button onclick="reproducirAudio()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition shadow-md shadow-emerald-600/20">
+                    ▶️ Reproduzir
+                </button>
+                <button onclick="detenerAudio()" class="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 px-4 py-2 rounded-xl text-sm font-medium transition">
+                    ⏹️ Parar
+                </button>
+
+                <div class="ml-auto flex items-center gap-2">
+                    <label class="text-xs font-semibold text-emerald-800">Velocidade:</label>
+                    <select id="velocidad" class="px-2.5 py-1.5 border border-emerald-300 rounded-xl text-xs bg-white text-emerald-900 font-medium focus:outline-none">
+                        <option value="0.7">0.7x (Lenta)</option>
+                        <option value="0.8">0.8x</option>
+                        <option value="0.9" selected>0.9x (Normal)</option>
+                        <option value="1">1.0x (Rápida)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="estadoAudio" class="text-xs text-emerald-700 mt-3 font-medium">
+                Pronto para reproduzir
+            </div>
+        </div>
+
+        <!-- Bloco Gramática B1 -->
+        <div>
+            <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                Orientação gramatical B1
+            </h2>
+            <div id="gramatica" class="bg-blue-50/70 border border-blue-200 rounded-2xl p-4 text-sm text-slate-700 leading-relaxed shadow-sm"></div>
+        </div>
+
+    </div>
+
+    <!-- Histórico de Traduções Recentes -->
+    <div id="historialContainer" class="hidden mt-10 pt-6 border-t border-slate-200">
+        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Histórico recente:</h3>
+        <div id="listaHistorial" class="space-y-2"></div>
+    </div>
+
+</div>
+
+<script>
+let voces = [];
+let textoParaAudio = "";
+let idiomaAudio = "es-ES";
+let historial = [];
+
+function cargarVoces() {
+    if (!("speechSynthesis" in window)) return;
+    voces = window.speechSynthesis.getVoices();
+}
+
+cargarVoces();
+if ("speechSynthesis" in window) {
+    window.speechSynthesis.onvoiceschanged = cargarVoces;
+}
+
+function buscarVoz(idioma) {
+    if (!voces.length) voces = window.speechSynthesis.getVoices();
+    let voz = voces.find(v => v.lang.toLowerCase() === idioma.toLowerCase());
+    if (voz) return voz;
+    const base = idioma.substring(0, 2).toLowerCase();
+    return voces.find(v => v.lang.toLowerCase().startsWith(base)) || null;
+}
+
+function actualizarContador() {
+    const texto = document.getElementById("texto").value;
+    document.getElementById("contadorCaracteres").innerText = `${texto.length}/300`;
+}
+
+async function traducir() {
+    const textoOriginal = document.getElementById("texto").value.trim();
+    
+    const textoLimpio = textoOriginal.replace(/[¿?¡!.,]/g, '').trim();
+    const textoParaDiccionario = textoLimpio.toLowerCase();
+    
+    const direccion = document.getElementById("direccion").value;
+
+    if (!textoOriginal) {
+        alert("Por favor, escreva uma palavra ou frase para traduzir.");
+        return;
+    }
+
+    const loading = document.getElementById("loading");
+    const resultado = document.getElementById("resultado");
+    const boton = document.getElementById("btnTraducir");
+
+    loading.classList.remove("hidden");
+    resultado.classList.add("hidden");
+    boton.disabled = true;
+
+    detenerAudio();
+
+    // 1. Sistema de cache local
+    const cacheKey = `traduccion_${direccion}_${textoOriginal}`;
+    const traduccionGuardada = localStorage.getItem(cacheKey);
+
+    if (traduccionGuardada) {
+        const traduccion = traduccionGuardada;
+        textoParaAudio = traduccion;
+        document.getElementById("traduccion").innerText = traduccion;
+        document.getElementById("gramatica").innerHTML = `
+            <strong class="text-blue-900 block mb-1">💡 Análise B1 (Cache local):</strong>
+            <p>Tradução recuperada instantaneamente sem consumir solicitações adicionais.</p>
+        `;
+        loading.classList.add("hidden");
+        resultado.classList.remove("hidden");
+        boton.disabled = false;
+        agregarAlHistorial(textoOriginal, traduccion);
+        return;
+    }
+
+    // Dicionário local estrito (falsos amigos / expressões comuns PT-ES)
+    const diccionarioExacto = {
+        "bom dia": "Buenos días",
+        "boa tarde": "Buenas tardes",
+        "boa noite": "Buenas noches",
+        "olá": "Hola",
+        "como vai": "¿Cómo estás?",
+        "buenos dias": "Bom dia",
+        "buenas tardes": "Boa tarde",
+        "buenas noches": "Boa noite",
+        "hola": "Olá",
+        "como estas": "¿Cómo estás?"
+    };
+
+    if (diccionarioExacto[textoParaDiccionario]) {
+        const traduccion = diccionarioExacto[textoParaDiccionario];
+        textoParaAudio = traduccion;
+        document.getElementById("traduccion").innerText = traduccion;
+        document.getElementById("gramatica").innerHTML = `
+            <strong class="text-blue-900 block mb-1">💡 Análise B1 sugerida:</strong>
+            <p>Expressão cotidiana corrigida localmente para garantir precisão absoluta entre português e espanhol.</p>
+        `;
+        localStorage.setItem(cacheKey, traduccion);
+        loading.classList.add("hidden");
+        resultado.classList.remove("hidden");
+        boton.disabled = false;
+        agregarAlHistorial(textoOriginal, traduccion);
+        return;
+    }
+
+    // 2. Uso do Google Translate sem API Key
+    const langFrom = direccion === "pt-es" ? "pt" : "es";
+    const langTo = direccion === "pt-es" ? "es" : "pt";
+    idiomaAudio = direccion === "pt-es" ? "es-ES" : "pt-BR";
+
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${langFrom}&tl=${langTo}&dt=t&q=${encodeURIComponent(textoOriginal)}`;
+
+    try {
+        const respuesta = await fetch(url);
+        if (!respuesta.ok) throw new Error("Não foi possível conectar ao serviço de tradução.");
+
+        const datos = await respuesta.json();
+        if (!datos || !datos[0]) {
+            throw new Error("Nenhuma tradução válida encontrada.");
+        }
+
+        const traduccion = datos[0].map(segmento => segmento[0]).join('');
+        textoParaAudio = traduccion;
+
+        localStorage.setItem(cacheKey, traduccion);
+
+        document.getElementById("traduccion").innerText = traduccion;
+
+        document.getElementById("gramatica").innerHTML = direccion === "pt-es"
+            ? `
+                <strong class="text-blue-900 block mb-1">💡 Dicas-chave para o nível B1 (Português ➔ Espanhol):</strong>
+                <ul class="list-disc ml-5 space-y-1">
+                    <li>Cuidado com os <strong>falsos amigos</strong> (ex: <em>exquisito</em> em espanhol significa saboroso/requintado, não esquisito).</li>
+                    <li>Preste atenção à colocação pronominal: no espanhol a ênclise é menos comum em início de frase.</li>
+                    <li>Verifique as irregularidades nos verbos no pretérito indefinido.</li>
+                </ul>
+            `
+            : `
+                <strong class="text-blue-900 block mb-1">💡 Dicas-chave para o nível B1 (Espanhol ➔ Português):</strong>
+                <ul class="list-disc ml-5 space-y-1">
+                    <li>Fique atento às contrações e artigos contraídos característicos do português (<em>no, na, pelo, pela</em>).</li>
+                    <li>Observe a nasalidade típica das vogais em português (tios, acentos circunflexos).</li>
+                    <li>Analise o uso dos pronomes de tratamento (<em>você</em> vs. <em>tu</em>).</li>
+                </ul>
+            `;
+
+        resultado.classList.remove("hidden");
+        agregarAlHistorial(textoOriginal, traduccion);
+
+    } catch (error) {
+        console.error(error);
+        alert("Erro ao traduzir: " + error.message);
+    } finally {
+        loading.classList.add("hidden");
+        boton.disabled = false;
+    }
+}
+
+function reproducirAudio() {
+    if (!textoParaAudio) {
+        alert("Primeiro realize uma tradução.");
+        return;
+    }
+    if (!("speechSynthesis" in window)) {
+        alert("Seu navegador não suporta síntese de voz.");
+        return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    const velocidad = parseFloat(document.getElementById("velocidad").value);
+    const estado = document.getElementById("estadoAudio");
+    const mensaje = new SpeechSynthesisUtterance(textoParaAudio);
+
+    mensaje.lang = idiomaAudio;
+    mensaje.rate = velocidad;
+    mensaje.volume = 1;
+    mensaje.pitch = 1;
+
+    const voz = buscarVoz(idiomaAudio);
+    if (voz) {
+        mensaje.voice = voz;
+        estado.innerText = `🔊 Reproduzindo com voz nativa (${voz.name})`;
+    } else {
+        estado.innerText = "🔊 Reproduzindo áudio...";
+    }
+
+    mensaje.onend = () => { estado.innerText = "✓ Áudio finalizado com sucesso"; };
+    mensaje.onerror = () => { estado.innerText = "⚠️ Erro ao reproduzir áudio"; };
+
+    window.speechSynthesis.speak(mensaje);
+}
+
+function detenerAudio() {
+    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    const estado = document.getElementById("estadoAudio");
+    if (estado) estado.innerText = "Áudio parado";
+}
+
+function copiarTraduccion() {
+    const texto = document.getElementById("traduccion").innerText;
+    navigator.clipboard.writeText(texto).then(() => {
+        alert("Tradução copiada para a área de transferência!");
+    });
+}
+
+function agregarAlHistorial(orig, trad) {
+    historial.unshift({ orig, trad });
+    if (historial.length > 3) historial.pop();
+
+    const contenedor = document.getElementById("historialContainer");
+    const lista = document.getElementById("listaHistorial");
+    lista.innerHTML = "";
+
+    historial.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "text-xs bg-slate-50 border border-slate-200 p-2.5 rounded-xl flex justify-between items-center";
+        div.innerHTML = `<span class="truncate max-w-[180px] font-medium"><strong>${item.orig}</strong></span> <span class="text-slate-400">➔</span> <span class="truncate max-w-[180px] text-blue-700 font-semibold">${item.trad}</span>`;
+        lista.appendChild(div);
+    });
+
+    contenedor.classList.remove("hidden");
+}
+
+function iniciarVoz() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        alert("O reconhecimento de voz não está disponível neste navegador. Utilize o Google Chrome ou Microsoft Edge.");
+        return;
+    }
+
+    const reconocimiento = new SpeechRecognition();
+    const direccion = document.getElementById("direccion").value;
+    reconocimiento.lang = direccion === "pt-es" ? "pt-BR" : "es-ES";
+    reconocimiento.continuous = false;
+    reconocimiento.interimResults = false;
+
+    const boton = document.getElementById("btnMicrofono");
+    boton.innerText = "🎙️ Ouvindo...";
+    boton.classList.add("bg-rose-100");
+
+    reconocimiento.onresult = (event) => {
+        document.getElementById("texto").value = event.results[0][0].transcript;
+        actualizarContador();
+        boton.innerText = "🎙️ Ditado por voz";
+        boton.classList.remove("bg-rose-100");
+    };
+
+    reconocimiento.onerror = () => {
+        boton.innerText = "🎙️ Ditado por voz";
+        boton.classList.remove("bg-rose-100");
+    };
+
+    reconocimiento.onend = () => {
+        boton.innerText = "🎙️ Ditado por voz";
+        boton.classList.remove("bg-rose-100");
+    };
+
+    try {
+        reconocimiento.start();
+    } catch (e) {
+        boton.innerText = "🎙️ Ditado por voz";
+        boton.classList.remove("bg-rose-100");
+    }
+}
+</script>
+
+</body>
+</html>
