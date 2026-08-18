@@ -1,4 +1,4 @@
-Tradutor Português-Espanhol B1 🇧🇷🇪🇸
+Tradutor Português-Espanhol B1 🇵🇹🇪🇸
 Una aplicación web moderna, rápida y adaptable diseñada para el aprendizaje, la traducción y el dominio entre el portugués y el español en un nivel intermedio (B1). Está desarrollada con Tailwind CSS y JavaScript nativo, funcionando completamente en el lado del cliente sin necesidad de APIs de pago externas ni registros en servidores.
 
 ✨ Características Principales
