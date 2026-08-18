@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tradutor Português-Espanhol B1 - Pró Corrigido</title>
+    <title>Tradutor Português-Espanhol B1 - PT-PT</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gradient-to-br from-slate-100 to-slate-200 min-h-screen py-10 px-4 text-slate-800">
@@ -17,7 +17,7 @@
                 Tradutor PT ⇄ ES 🇵🇹 <span class="text-xs bg-blue-100 text-blue-800 font-semibold px-2.5 py-1 rounded-full uppercase">Nível B1</span>
             </h1>
             <p class="text-sm text-slate-500 mt-1">
-                Tradução inteligente · Pronúncia avançada · Análise gramatical
+                Tradução inteligente · Pronúncia avançada · Análise gramatical (PT-PT)
             </p>
         </div>
     </header>
@@ -56,7 +56,7 @@
 
     <!-- Carregando -->
     <div id="loading" class="hidden text-center my-6 text-slate-500 animate-pulse font-medium text-sm">
-        Traduzindo instantaneamente...
+        A traduzir instantaneamente...
     </div>
 
     <!-- Resultado -->
@@ -101,7 +101,7 @@
             </div>
 
             <div id="estadoAudio" class="text-xs text-emerald-700 mt-3 font-medium">
-                Pronto para reproduzir
+                Pronto a reproduzir
             </div>
         </div>
 
@@ -214,7 +214,7 @@ async function traducir() {
         document.getElementById("traduccion").innerText = traduccion;
         document.getElementById("gramatica").innerHTML = `
             <strong class="text-blue-900 block mb-1">💡 Análise B1 sugerida:</strong>
-            <p>Expressão cotidiana corrigida localmente para garantir precisão absoluta entre português e espanhol.</p>
+            <p>Expressão quotidiana corrigida localmente para garantir precisão absoluta entre português e espanhol.</p>
         `;
         localStorage.setItem(cacheKey, traduccion);
         loading.classList.add("hidden");
@@ -227,13 +227,13 @@ async function traducir() {
     // 2. Uso do Google Translate sem API Key
     const langFrom = direccion === "pt-es" ? "pt" : "es";
     const langTo = direccion === "pt-es" ? "es" : "pt";
-    idiomaAudio = direccion === "pt-es" ? "es-ES" : "pt-BR";
+    idiomaAudio = direccion === "pt-es" ? "es-ES" : "pt-PT";
 
     const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${langFrom}&tl=${langTo}&dt=t&q=${encodeURIComponent(textoOriginal)}`;
 
     try {
         const respuesta = await fetch(url);
-        if (!respuesta.ok) throw new Error("Não foi possível conectar ao serviço de tradução.");
+        if (!respuesta.ok) throw new Error("Não foi possível ligar ao serviço de tradução.");
 
         const datos = await respuesta.json();
         if (!datos || !datos[0]) {
@@ -257,11 +257,11 @@ async function traducir() {
                 </ul>
             `
             : `
-                <strong class="text-blue-900 block mb-1">💡 Dicas-chave para o nível B1 (Espanhol ➔ Português):</strong>
+                <strong class="text-blue-900 block mb-1">💡 Dicas-chave para o nível B1 (Espanhol ➔ Português - PT-PT):</strong>
                 <ul class="list-disc ml-5 space-y-1">
-                    <li>Fique atento às contrações e artigos contraídos característicos do português (<em>no, na, pelo, pela</em>).</li>
-                    <li>Observe a nasalidade típica das vogais em português (tios, acentos circunflexos).</li>
-                    <li>Analise o uso dos pronomes de tratamento (<em>você</em> vs. <em>tu</em>).</li>
+                    <li>Atente na colocação dos pronomes clíticos e nas contrações típicas do português europeu.</li>
+                    <li>Observe a abertura ou fecho das vogais e a nasalidade caraterística.</li>
+                    <li>Analise o uso adequado dos tratamentos formais e informais (<em>tu</em> vs. <em>você</em> / <em>o senhor / a senhora</em>).</li>
                 </ul>
             `;
 
@@ -283,7 +283,7 @@ function reproducirAudio() {
         return;
     }
     if (!("speechSynthesis" in window)) {
-        alert("Seu navegador não suporta síntese de voz.");
+        alert("O seu navegador não suporta síntese de voz.");
         return;
     }
 
@@ -301,9 +301,9 @@ function reproducirAudio() {
     const voz = buscarVoz(idiomaAudio);
     if (voz) {
         mensaje.voice = voz;
-        estado.innerText = `🔊 Reproduzindo com voz nativa (${voz.name})`;
+        estado.innerText = `🔊 A reproduzir com voz nativa (${voz.name})`;
     } else {
-        estado.innerText = "🔊 Reproduzindo áudio...";
+        estado.innerText = "🔊 A reproduzir áudio...";
     }
 
     mensaje.onend = () => { estado.innerText = "✓ Áudio finalizado com sucesso"; };
@@ -352,12 +352,12 @@ function iniciarVoz() {
 
     const reconocimiento = new SpeechRecognition();
     const direccion = document.getElementById("direccion").value;
-    reconocimiento.lang = direccion === "pt-es" ? "pt-BR" : "es-ES";
+    reconocimiento.lang = direccion === "pt-es" ? "pt-PT" : "es-ES";
     reconocimiento.continuous = false;
     reconocimiento.interimResults = false;
 
     const boton = document.getElementById("btnMicrofono");
-    boton.innerText = "🎙️ Ouvindo...";
+    boton.innerText = "🎙️ A escuta...";
     boton.classList.add("bg-rose-100");
 
     reconocimiento.onresult = (event) => {
